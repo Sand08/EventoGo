@@ -1,0 +1,12 @@
+{
+    "name": "file-sink-german-cities",
+    "config": {
+      "connector.class": "org.apache.kafka.connect.file.FileStreamSinkConnector",
+      "tasks.max": "1",
+      "topics": "german_city_weather",
+      "file": "/data/german_cities_weather.json",
+      "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+      "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+      "value.converter.schemas.enable": "false"
+    }
+  }
