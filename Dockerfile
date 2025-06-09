@@ -2,6 +2,7 @@ FROM confluentinc/cp-kafka-connect:7.6.0
 
 # Install the file connector
 COPY plugins/filestream /usr/share/confluent-hub-components/filestream
+COPY plugins/mongo /usr/share/confluent-hub-components/mongo
 
 # Switch to root to create directories
 USER root

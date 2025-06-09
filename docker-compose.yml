@@ -53,15 +53,10 @@ services:
     volumes:
       - ./data:/data
 
-  spark:
-    image: bitnami/spark:3.4
-    container_name: spark
-    depends_on:
-      - kafka
-    environment:
-      - SPARK_MODE=master
-      - SPARK_MASTER_HOST=spark
+  mongo:
+    image: mongo
+    container_name: mongo
     ports:
-      - "4040:4040"
+      - "27017:27017"
     volumes:
-      - ./spark-apps:/opt/spark-apps
+      - ./mongo-data:/data/db
