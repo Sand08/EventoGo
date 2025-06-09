@@ -4,11 +4,6 @@ import pprint
 MONGO_URI = "mongodb://localhost:27017"
 client = MongoClient(MONGO_URI)
 
-# List all databases
-print("📚 Databases:")
-for db_name in client.list_database_names():
-    print(" -", db_name)
-
 # Connect to your database
 db_name = "eventcast"
 db = client[db_name]

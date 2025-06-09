@@ -57,6 +57,13 @@ for msg in consumer:
         "session_id": session_id
     }]
 
+    producer.send("city_data",{
+        "city": user_row.iloc[0]["city"],
+        "lat": user_row.iloc[0]["lat"],
+        "lon": user_row.iloc[0]["lon"],
+        "session_id": session_id
+    })
+    print("Sent user data")
     # Filter cities in range
     for _, row in df.iterrows():
         if row["city"].lower() == city.lower():
@@ -72,14 +79,23 @@ for msg in consumer:
                 "lon": row["lon"],
                 "session_id": session_id
             })
+            data = {
+                "city": row["city"],
+                "lat": row["lat"],
+                "lon": row["lon"],
+                "session_id": session_id
+            }
+            print(f"[fetch_cities] Sent: {data}")
+            producer.send("city_data",value=data)
+            
 
     print(f"[fetch_cities] Found {len(results)} cities near {city} within {range_km} km")
-
-    # Send each city to the city_data topic
-    producer.send("city_data", value=results)
-    print(f"[fetch_cities] Sent: {results}")
-
     producer.flush()
+    # # Send each city to the city_data topic
+    # producer.send("city_data", value=results)
+    # print(f"[fetch_cities] Sent: {results}")
+
+    # producer.flush()
     
     # Send session info to a control topic
     session_info = {

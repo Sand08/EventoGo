@@ -7,6 +7,9 @@ import json
 import time
 import os
 import uuid
+import mongopy
+import matplotlib.pyplot as plt
+import seaborn as sns
 from streamlit_folium import st_folium
 from kafka import KafkaProducer
 import requests
@@ -309,7 +312,7 @@ if st.session_state["session_id"]:
             st.metric("Rainy Cities", rainy_count)
         
         # Create tabs
-        tab1, tab2, tab3 = st.tabs(["🗺️ Map View", "📊 Weather Details", "🎪 Events"])
+        tab1, tab2, tab3, tab4 = st.tabs(["🗺️ Map View", "📊 Weather Details", "🎪 Events", "📈 Weather Analysis"])
         
         with tab1:
             # Create map
@@ -436,3 +439,26 @@ if st.session_state["session_id"]:
                     st.info("No events found for the selected criteria.")
             else:
                 st.info("Enable 'Include Events' in the sidebar to see upcoming events.")
+        with tab4:
+            st.subheader("📈 Weather Analysis")
+            # Example analysis snippet: average temperature distribution by weather category
+            if not df_filtered.empty:
+                # Prepare data
+                df_filtered["temp"] = df_filtered["weather"].apply(lambda x: x.get("temperature_2m", None))
+                df_filtered = df_filtered.dropna(subset=["temp"])
+
+                # Plot temperature distribution by weather category
+                fig, ax = plt.subplots(figsize=(8, 5))
+                sns.boxplot(x="weather_category", y="temp", data=df_filtered, ax=ax)
+                ax.set_title("Temperature Distribution by Weather Category")
+                ax.set_xlabel("Weather Category")
+                ax.set_ylabel("Temperature (°C)")
+                st.pyplot(fig)
+
+                # Show summary statistics
+                st.markdown("### Summary Statistics")
+                st.write(df_filtered.groupby("weather_category")["temp"].describe())
+            else:
+                st.info("No weather data available for analysis.")
+
+

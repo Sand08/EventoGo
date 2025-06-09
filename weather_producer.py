@@ -54,35 +54,34 @@ print(f"[weather_producer] Starting weather producer...")
 
 for msg in consumer:
     session_file = f"{DATA_DIR}/weather_session.json"
-    with open(session_file, "w") as f:
+    with open(session_file, "a") as f:
         print("[weather_producer] Waiting for new city data...")
-        results = msg.value
-        print(results)
-        for data in results:
-            print(data)
-            # data = ast.literal_eval(data)  # Convert string representation of dict to actual dict
-            city = data["city"]
-            print(f"[weather_producer] Processing city: {city}")
-            lat, lon = data["lat"], data["lon"]
-                
-            weather = fetch_weather(lat, lon)
-                
-            if weather:
-                print(f"[weather_producer] Fetched weather for {city}: {weather}")
-                weather_category = get_weather_category(weather.get("weathercode", -1))
-                weather_data = {
-                    "city": city,
-                    "lat": lat,
-                    "lon": lon,
-                    "weather": weather,
-                    "weather_category": weather_category,
-                    "timestamp": datetime.now().isoformat()
-                    }
+        data = msg.value
+        # print(results)
+        # for data in results:
+        print(data)
+        city = data["city"]
+        print(f"[weather_producer] Processing city: {city}")
+        lat, lon = data["lat"], data["lon"]
             
-                # Send to Kafka topic for sink connector
-                producer.send("weather_data", value=weather_data)
-                producer.flush()    
-                # Write to session file
-                f.write(json.dumps(weather_data) + "\n")
-                print(f"[weather_producer] {city}: {weather.get('temperature_2m')}°C, {weather_category}")
+        weather = fetch_weather(lat, lon)
+            
+        if weather:
+            print(f"[weather_producer] Fetched weather for {city}: {weather}")
+            weather_category = get_weather_category(weather.get("weathercode", -1))
+            weather_data = {
+                "city": city,
+                "lat": lat,
+                "lon": lon,
+                "weather": weather,
+                "weather_category": weather_category,
+                "timestamp": datetime.now().isoformat()
+                }
+        
+            # Send to Kafka topic for sink connector
+            producer.send("weather_data", value=weather_data)
+            producer.flush()    
+            # Write to session file
+            f.write(json.dumps(weather_data) + "\n")
+            print(f"[weather_producer] {city}: {weather.get('temperature_2m')}°C, {weather_category}")
  
