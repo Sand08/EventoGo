@@ -19,7 +19,11 @@ DATA_DIR = "./current"
 BOOTSTRAP_SERVERS = "localhost:9092"
 WAIT_SECONDS = 30
 TICKETMASTER_API_KEY = "bN9mOHps6ZdE1nIioUAogmd4GnmtxrFs"
-
+# Kafka Producer Setup
+producer = KafkaProducer(
+    bootstrap_servers="localhost:9092",
+    value_serializer=lambda v: json.dumps(v).encode("utf-8")
+)
 # -------------- STYLING --------------
 st.set_page_config(
     page_title="German Weather & Events Explorer",
@@ -134,10 +138,10 @@ def fetch_events(city_name, event_type=None, weather_category=None, date_range=N
             
             events.append(event_info)
         
-        return events[:5]  # Return top 5 events
+        return events[:5]  
         
     except Exception as e:
-        st.error(f"Error fetching events for {city_name}: {str(e)}")
+        print(f"Error fetching events for {city_name}: {str(e)}")
         return []
 
 def get_weather_icon(weathercode):
@@ -418,6 +422,16 @@ if st.session_state["session_id"]:
                                     {f"<p>💰 <b>Price:</b> €{event['min_price']}-€{event['max_price']}</p>" if event['min_price'] else ""}
                                 </div>
                                 """, unsafe_allow_html=True)
+                                if st.button(
+                                    "Interested",
+                                    key=f"book_{city}_{event['name']}",
+                                    help="Click to book this event",
+                                    use_container_width=True
+                                ):
+                                    # 🔁 Send event details to Kafka
+                                    producer.send("events", value=event)
+                                    producer.flush()
+                                    st.success(f"✅ Your interest has been saved")
                 else:
                     st.info("No events found for the selected criteria.")
             else:
