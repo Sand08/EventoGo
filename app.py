@@ -26,7 +26,7 @@ producer = KafkaProducer(
 )
 # -------------- STYLING --------------
 st.set_page_config(
-    page_title="German Weather & Events Explorer",
+    page_title="🌤️EventCast🌤️",
     page_icon="🌤️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -169,7 +169,7 @@ def get_weather_color(weather_category):
 # Header
 col1, col2 = st.columns([3, 1])
 with col1:
-    st.title("🌤️ German Weather & Events Explorer")
+    st.title("🌤️ EventCast")
     st.markdown("*Discover weather conditions and events across German cities*")
 
 # Sidebar
@@ -295,7 +295,7 @@ if st.session_state["session_id"]:
             df_filtered = df
         
         # Display summary
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4,col5 = st.columns(5)
         with col1:
             st.metric("Cities Found", len(df_filtered))
         with col2:
@@ -305,6 +305,9 @@ if st.session_state["session_id"]:
             sunny_count = len(df_filtered[df_filtered["weather_category"] == "sunny"])
             st.metric("Sunny Cities", sunny_count)
         with col4:
+            cloudy_count = len(df_filtered[df_filtered["weather_category"] == "cloudy"])
+            st.metric("Cloudy Cities", cloudy_count)
+        with col5:
             rainy_count = len(df_filtered[df_filtered["weather_category"] == "rainy"])
             st.metric("Rainy Cities", rainy_count)
         
